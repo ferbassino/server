@@ -1,0 +1,1 @@
+DELETE http://localhost:3001/api/evaluations/6328b29908be257ae472f03e

@@ -1,1 +1,12 @@
-Get  http://localhost:3001/api/uploadmongo
+POST   http://localhost:3001/api/evaluations
+Content-Type: application/json
+
+{
+  "email": "pepitalapistolera@gmail.com",
+  "evaluation": "actualizado",
+  "segment": "actualizado",
+  "csvFile": {
+    "csvData": "Time",
+    "contentType": "text/csv"
+  },
+};
