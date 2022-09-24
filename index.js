@@ -8,9 +8,13 @@ const mongoose = require("mongoose");
 const ModelData = require("./model_data");
 const fileUpload = require("express-fileupload");
 const cors = require("cors");
+const usersRouter = require("./Controlellers/users");
+const loginRouter = require("./Controlellers/login");
 const bodyParser = require("body-parser");
 const notFound = require("./middlewares/notFound");
 const handleErrors = require("./middlewares/handleErrors");
+const User = require("./user");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 
@@ -87,23 +91,47 @@ app.delete("/api/evaluations/:id", (req, res, next) => {
 });
 
 //----------------CARGAR UN RECURSO-------------
-app.post("/api/evaluations", (req, res) => {
+app.post("/api/evaluations", async (req, res) => {
   const data = {
     email: req.body.email,
     evaluation: req.body.evaluacion,
     segment: req.body.segmento,
+
+    // userId: req.body.id,
+
     // csvFile: req.files.csvFile.data,
   };
+  //vamos a recuperar el token por la cabecera
+  const authorization = req.get("authorization");
+  let token = "";
+  //ahora validamos si esta la autentificacion y si comienza con la palabre bearer
+  if (authorization && authorization.toLowerCase().startsWith("bearer")) {
+    token = authorization.substring(7);
+  }
+
+  //vamos a decodificar la informacion del token
+
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+
+  //validamos otra vez para decir que no hay acceso
+  if (!token || !decodedToken.id) {
+    return res.status(401).json({ error: "token missing or invalid" });
+  }
 
   let modelData = new ModelData(data);
 
   modelData.csvFile.csvData = req.files.csvFile.data;
   modelData.csvFile.contentType = req.files.csvFile.mimetype;
 
-  console.log(modelData);
+  const user = await User.findById(decodedToken.id);
+
+  modelData.user = user._id;
 
   modelData.save((err) => {
     if (!err) {
+      user.evaluations = user.evaluations.concat(modelData._id);
+      user.save();
+
       res.send("datos agregados correctamente");
       // mongoose.connection.close();
     } else {
@@ -113,6 +141,11 @@ app.post("/api/evaluations", (req, res) => {
 });
 
 //middlewares
+//para los controladores de las cuenta de usuario
+app.use("/api/users", usersRouter);
+//para el logeo
+app.use("/api/login", loginRouter);
+
 //para el 404, si no entra en inguno de los enndpoint que definimos, que nos de un 404
 app.use(notFound);
 // middleware para el manejo de errores que recibe tres parametros el primero es el error

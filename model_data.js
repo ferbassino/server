@@ -19,6 +19,13 @@ const modelData = new Schema({
     csvData: String,
     contentType: String,
   },
+
+  //aca establecemos la relacion con el usuario
+
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+  },
 });
 
 //tenemos que transformar el to json porque sino nos devuelve un objeto muy complejo. queremos que venga id y no _id, y que tampoco devuelva __v
