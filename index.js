@@ -33,7 +33,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: "true" }));
 
 app.get("/", (req, res) => {
-  res.send("pusimos cors hasta en .env");
+  res.send("pusimos cors agregamos expres");
 });
 
 //------------TODOS LOS RECURSOS-------------

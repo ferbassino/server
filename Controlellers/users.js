@@ -2,6 +2,7 @@ const usersRouter = require("express").Router();
 const User = require("../user");
 //importamos bcrypt para encriptar el password
 const bcrypt = require("bcrypt");
+const express = require("express");
 
 //-------------CORS-----------------
 const cors = require("cors");
