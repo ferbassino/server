@@ -18,10 +18,12 @@ const jwt = require("jsonwebtoken");
 
 const app = express();
 
+//middlewares: son funciones que interceptan las peticiones (use se refiere a cualquier peticion)y se ejecutan en orden de arriba ajajo y evalua como se requieren los recursos y se aplican si encajan, por ejemplo en un get, post, y asi
 app.use(fileUpload());
 app.use(cors());
-app.use(express.json());
 //para soportar lo que viene en la request y parsearlo
+app.use(express.json());
+//no se si es necesario esto
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: "true" }));
 
@@ -49,7 +51,7 @@ app.get("/api/evaluations/:id", (req, res, next) => {
     });
 });
 
-//-----------ACTUALIZAR UN RECURSO --------- No funciona
+//-----------ACTUALIZAR UN RECURSO --------- falta actualizar el archivo csv???
 app.put("/api/evaluations/:id", (req, res, next) => {
   // guardamos en constantes el id y lo que viene de la request
   const id = req.params.id;
@@ -62,8 +64,8 @@ app.put("/api/evaluations/:id", (req, res, next) => {
     evaluation: evaluation.evaluation,
     segment: evaluation.segment,
     // csvFile: {
-    //   csvData: evaluation.files.csvFile.data,
-    //   contentType: evaluation.files.csvFile.mimetype,
+    //   csvData: req.files.csvFile.data,
+    //   contentType: req.files.csvFile.mimetype,
     // },
   };
 
@@ -71,7 +73,7 @@ app.put("/api/evaluations/:id", (req, res, next) => {
 
   ModelData.findByIdAndUpdate(id, newEvaluationInfo, { new: true })
     .then((data) => {
-      res.json(data);
+      res.json("esta es la res.json del find", data);
     })
     .catch((err) => {
       next(err);
@@ -96,11 +98,19 @@ app.post("/api/evaluations", async (req, res) => {
     email: req.body.email,
     evaluation: req.body.evaluacion,
     segment: req.body.segmento,
-
-    // userId: req.body.id,
-
-    // csvFile: req.files.csvFile.data,
   };
+
+  //validacion por si el file no viene, no funciona
+  // if (req.files.csvFile.data === undefined) {
+  //   res.status(400).json({
+  //     error: "datos incompletos",
+  //   });
+  // }
+  let modelData = new ModelData(data);
+  modelData.csvFile.csvData = req.files.csvFile.data;
+  modelData.csvFile.contentType = req.files.csvFile.mimetype;
+
+  //---------------TOKEN-----------------
   //vamos a recuperar el token por la cabecera
   const authorization = req.get("authorization");
   let token = "";
@@ -118,11 +128,6 @@ app.post("/api/evaluations", async (req, res) => {
     return res.status(401).json({ error: "token missing or invalid" });
   }
 
-  let modelData = new ModelData(data);
-
-  modelData.csvFile.csvData = req.files.csvFile.data;
-  modelData.csvFile.contentType = req.files.csvFile.mimetype;
-
   const user = await User.findById(decodedToken.id);
 
   modelData.user = user._id;
@@ -132,7 +137,8 @@ app.post("/api/evaluations", async (req, res) => {
       user.evaluations = user.evaluations.concat(modelData._id);
       user.save();
 
-      res.send("datos agregados correctamente");
+      res.send(modelData);
+
       // mongoose.connection.close();
     } else {
       res.send(err);
