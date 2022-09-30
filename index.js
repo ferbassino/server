@@ -33,7 +33,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: "true" }));
 
 app.get("/", (req, res) => {
-  res.send("hola desde el backend a ver ahora");
+  res.send("hola desde el backend cons asterisco");
 });
 
 //------------TODOS LOS RECURSOS-------------
