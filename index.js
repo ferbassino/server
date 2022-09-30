@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 //requerimos el modelo de los datos del paciente
 const ModelData = require("./model_data");
 const fileUpload = require("express-fileupload");
+//compartir recursos de distintos origenes, podemos decidir que origenes acceden a nuestro recurso
 const cors = require("cors");
 const usersRouter = require("./Controlellers/users");
 const loginRouter = require("./Controlellers/login");
@@ -18,7 +19,7 @@ const jwt = require("jsonwebtoken");
 
 const app = express();
 
-//middlewares: son funciones que interceptan las peticiones (use se refiere a cualquier peticion)y se ejecutan en orden de arriba ajajo y evalua como se requieren los recursos y se aplican si encajan, por ejemplo en un get, post, y asi
+//middlewares: son funciones que interceptan las peticiones (use se refiere a cualquier peticion) y se ejecutan en orden de arriba ajajo y evalua como se requieren los recursos y se aplican si encajan, por ejemplo en un get, post, y asi. muy util para los 404
 app.use(fileUpload());
 app.use(cors());
 //para soportar lo que viene en la request y parsearlo
