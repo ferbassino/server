@@ -1,7 +1,10 @@
 const mongoose = require("mongoose");
 
-const connectionString = process.env.MONGO_DB_URI;
+// `mongodb+srv://ferbassino:${CLAVE}cluster0.wbozqys.mongodb.net/kinapp-data?retryWrites=true&w=majority`;
 
+const connectionString = process.env.MONGO_DB_URI;
+CLAVE = process.env.CLAVE;
+console.log(CLAVE);
 mongoose
   .connect(connectionString)
   .then(() => {
