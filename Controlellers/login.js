@@ -36,8 +36,8 @@ loginRouter.post("/", async (request, response) => {
   //creamos el tokenlno, le decimos que queremos firmar userfortoken y le decimos la palabra secreta, y ademas le decimos que expire en un tercer parametro
   const SECRET = process.env.SECRET;
 
-  const token = jwt.sign(userForToken, "petroca");
-  // const token = jwt.sign(userForToken, process.env.SECRET);
+  // const token = jwt.sign(userForToken, "petroca");
+  const token = jwt.sign(userForToken, process.env.SECRET);
 
   //en la response tambien devolvemos el token
   response.send({
