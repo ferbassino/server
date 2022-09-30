@@ -5,6 +5,16 @@ const bcrypt = require("bcrypt");
 const loginRouter = require("express").Router();
 const User = require("../user");
 
+//-------------CORS-----------------
+const cors = require("cors");
+const app = express();
+app.use(
+  cors({
+    origin: "*",
+  })
+);
+//-------------CORS-----------------
+
 loginRouter.post("/", async (request, response) => {
   const { body } = request;
   const { username, password } = body;
