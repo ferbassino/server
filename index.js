@@ -158,7 +158,8 @@ app.use(notFound);
 // middleware para el manejo de errores que recibe tres parametros el primero es el error
 app.use(handleErrors);
 
-const PORT = process.env.PORT;
+//configuramos el puerto para que se utilice una variable de entorno llamada PORT, que está en .env, si no existe esa variable se utiliza 3001
+const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
   console.log(`listening on port ${PORT}`);
