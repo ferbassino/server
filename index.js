@@ -23,7 +23,7 @@ const app = express();
 app.use(fileUpload());
 app.use(
   cors({
-    origin: "https://kinapp22.herokuapp.com",
+    origin: "*",
   })
 );
 //para soportar lo que viene en la request y parsearlo
