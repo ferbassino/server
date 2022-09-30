@@ -29,7 +29,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: "true" }));
 
 app.get("/", (req, res) => {
-  res.send("hola desde el backend");
+  res.send("hola desde el backend Heroku");
 });
 
 //------------TODOS LOS RECURSOS-------------
@@ -74,7 +74,7 @@ app.put("/api/evaluations/:id", (req, res, next) => {
 
   ModelData.findByIdAndUpdate(id, newEvaluationInfo, { new: true })
     .then((data) => {
-      res.json("esta es la res.json del find", data);
+      res.json(data);
     })
     .catch((err) => {
       next(err);
