@@ -3,12 +3,6 @@ const User = require("../user");
 //importamos bcrypt para encriptar el password
 const bcrypt = require("bcrypt");
 
-//--------------CORS---------------
-const app = express();
-const cors = require("cors");
-app.use(cors());
-//-----------------------------
-
 //--------------OBTENER USUARIOS POST------------
 
 usersRouter.get("/", async (request, response) => {
