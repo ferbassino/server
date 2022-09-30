@@ -126,7 +126,7 @@ app.post("/api/evaluations", async (req, res) => {
   //modificacion
   //vamos a decodificar la informacion del token
 
-  const decodedToken = jwt.verify(token, process.env.SECRET);
+  const decodedToken = jwt.verify(token, `${process.env.SECRET}`);
 
   //validamos otra vez para decir que no hay acceso
   if (!token || !decodedToken.id) {
