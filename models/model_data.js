@@ -5,6 +5,9 @@ const Schema = mongoose.Schema;
 // definimos el esquema, que tipos de datos podemos tener en una conexion
 
 const modelData = new Schema({
+  date: {
+    type: Date,
+  },
   email: {
     type: String,
   },
@@ -28,7 +31,7 @@ const modelData = new Schema({
   },
 });
 
-//tenemos que transformar el to json porque sino nos devuelve un objeto muy complejo. queremos que venga id y no _id, y que tampoco devuelva __v
+//tenemos que transformar el tojson porque sino en la respuesta nos devuelve un objeto muy complejo. queremos que venga id y no _id, y que tampoco devuelva __v
 modelData.set("toJSON", {
   transform: (document, returnedObj) => {
     returnedObj.id = returnedObj._id;

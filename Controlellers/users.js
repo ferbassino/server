@@ -1,5 +1,5 @@
 const usersRouter = require("express").Router();
-const User = require("../user");
+const User = require("../models/user");
 //importamos bcrypt para encriptar el password
 const bcrypt = require("bcrypt");
 const express = require("express");

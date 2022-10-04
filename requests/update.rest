@@ -1,12 +1,8 @@
-PUT http://localhost:3001/api/evaluations/6335b7e14132c57f097a9154
+PUT http://localhost:3001/api/evaluations/6338a851c03013c9d339e71c
 Content-Type: application/json
 
 {
   "email": "pepitalapistolera@gmail.com",
   "evaluation": "actualizado",
-  "segment": "actualizado",
-  "csvFile": {
-      "csvData": "Time",
-      "contentType": "text/csv"
-  },
-};
+  "segment": "actualizado"
+}

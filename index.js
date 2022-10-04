@@ -5,7 +5,7 @@ require("./mongo");
 const express = require("express");
 const mongoose = require("mongoose");
 //requerimos el modelo de los datos del paciente
-const ModelData = require("./model_data");
+const ModelData = require("./models/model_data");
 const fileUpload = require("express-fileupload");
 //compartir recursos de distintos origenes, podemos decidir que origenes acceden a nuestro recurso
 const cors = require("cors");
@@ -14,7 +14,7 @@ const loginRouter = require("./Controlellers/login");
 const bodyParser = require("body-parser");
 const notFound = require("./middlewares/notFound");
 const handleErrors = require("./middlewares/handleErrors");
-const User = require("./user");
+const User = require("./models/user");
 const jwt = require("jsonwebtoken");
 
 const app = express();
@@ -37,20 +37,24 @@ app.get("/", (req, res) => {
 });
 
 //------------TODOS LOS RECURSOS-------------
-app.get("/api/evaluations", (req, res) => {
+app.get("/api/evaluations", (request, response) => {
   ModelData.find().then((evaluations) => {
-    res.json(evaluations);
+    response.json(evaluations);
   });
 });
 
 //------------- OBTENER UN RECURSO
 app.get("/api/evaluations/:id", (req, res, next) => {
+  //recordemos que el ":" indica que lo que viene despues es dinamico, en este caso queremos capturar el id para obtener un recurso, en la request lo dinamico viene en un objeto llamado params.  guardamos en una variable id lo que viene en la request como req.params.id
   const id = req.params.id;
 
+  //para encontrarlo aplicamos el metodo de mongoose findById(id) que encuentra el recurso y devuelve todos los datos de la base de ese recurso
   ModelData.findById(id)
     .then((data) => {
+      //retornamos los datos
       return res.json(data);
     })
+    //si el id no es cvorrecto capturamos el error y ejecutamos el next con el error y va a ir al middleware que tiene el error que es handleerrors
     .catch((err) => {
       next(err);
     });
@@ -62,19 +66,13 @@ app.put("/api/evaluations/:id", (req, res, next) => {
   const id = req.params.id;
   const evaluation = req.body;
 
-  console.log(req);
-
   const newEvaluationInfo = {
     email: evaluation.email,
     evaluation: evaluation.evaluation,
     segment: evaluation.segment,
-    // csvFile: {
-    //   csvData: req.files.csvFile.data,
-    //   contentType: req.files.csvFile.mimetype,
-    // },
   };
 
-  // lo que hace este metodo es actualizar esa id con la informacion del objeto newEvaluationInfo
+  // lo que hace este metodo es actualizar esa id con la informacion del objeto newEvaluationInfo, ojo que lo que devuelve es lo que encontro y no lo que se modifico, para eso en el 3 parametro le pasamos un objeto de configuracion para que devuelva el nuevo valor {new:true}
 
   ModelData.findByIdAndUpdate(id, newEvaluationInfo, { new: true })
     .then((data) => {
@@ -99,18 +97,21 @@ app.delete("/api/evaluations/:id", (req, res, next) => {
 
 //----------------CARGAR UN RECURSO-------------
 app.post("/api/evaluations", async (req, res) => {
+  // validacion por si el file no viene, no funciona
+  // if (!req.files.csvFile.data) {
+  //   res.status(400).json({
+  //     error: "datos incompletos",
+  //   });
+  // }
+
+  //creamos una evaluacion  con el modelo que respeta el esquema
   const data = {
+    date: new Date(),
     email: req.body.email,
     evaluation: req.body.evaluacion,
     segment: req.body.segmento,
   };
 
-  //validacion por si el file no viene, no funciona
-  // if (req.files.csvFile.data === undefined) {
-  //   res.status(400).json({
-  //     error: "datos incompletos",
-  //   });
-  // }
   let modelData = new ModelData(data);
   modelData.csvFile.csvData = req.files.csvFile.data;
   modelData.csvFile.contentType = req.files.csvFile.mimetype;
@@ -152,7 +153,7 @@ app.post("/api/evaluations", async (req, res) => {
   });
 });
 
-//middlewares
+//middlewares. es muy importante el orden de los middlewares. los de errores están al final para que se llamen luego de pasar por todos los endspoints
 //para los controladores de las cuenta de usuario
 app.use("/api/users", usersRouter);
 //para el logeo
@@ -160,7 +161,7 @@ app.use("/api/login", loginRouter);
 
 //para el 404, si no entra en inguno de los enndpoint que definimos, que nos de un 404
 app.use(notFound);
-// middleware para el manejo de errores que recibe tres parametros el primero es el error
+// middleware para el manejo de errores que recibe tres parametros el primero es el error, si hay error en alguna de las peticiones entra aca
 app.use(handleErrors);
 
 //configuramos el puerto para que se utilice una variable de entorno llamada PORT, que está en .env, si no existe esa variable se utiliza 3001
@@ -169,3 +170,5 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`listening on port ${PORT}`);
 });
+
+module.exports = { app, server };
