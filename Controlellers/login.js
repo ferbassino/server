@@ -28,7 +28,7 @@ loginRouter.post("/", async (request, response) => {
     });
   }
   //guradamos la informacion en jwt
-
+  console.log(user._id);
   const userForToken = {
     id: user._id,
     username: user.username,
