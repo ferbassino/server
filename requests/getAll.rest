@@ -1,1 +1,3 @@
 GET http://localhost:3001/api/evaluations
+###
+GET http://localhost:3001/api/users

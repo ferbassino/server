@@ -37,10 +37,13 @@ app.get("/", (req, res) => {
 });
 
 //------------TODOS LOS RECURSOS-------------
-app.get("/api/evaluations", (request, response) => {
-  ModelData.find().then((evaluations) => {
-    response.json(evaluations);
+app.get("/api/evaluations", async (request, response) => {
+  const evaluations = await ModelData.find({}).populate("user", {
+    username: 1,
+    name: 1,
   });
+
+  response.json(evaluations);
 });
 
 //------------- OBTENER UN RECURSO
@@ -117,14 +120,15 @@ app.post("/api/evaluations", async (req, res) => {
   modelData.csvFile.contentType = req.files.csvFile.mimetype;
 
   //---------------TOKEN-----------------
-  //vamos a recuperar el token por la cabecera
+  //vamos a recuperar el token que viene por la cabecera http. La cabecera de petición Authorization contiene las credenciales para autenticar a un usuario en un servidor
   const authorization = req.get("authorization");
   let token = "";
   //ahora validamos si esta la autentificacion y si comienza con la palabre bearer
   if (authorization && authorization.toLowerCase().startsWith("bearer")) {
+    //como la authorization viene en forma: "Bearer lsdafkjjasjdf...", le quitamos los 7 primeros caracteres para guardar en token solo el token
     token = authorization.substring(7);
   }
-  //modificacion
+
   //vamos a decodificar la informacion del token
 
   // const decodedToken = jwt.verify(token, process.env.SECRET);
@@ -134,14 +138,18 @@ app.post("/api/evaluations", async (req, res) => {
   if (!token || !decodedToken.id) {
     return res.status(401).json({ error: "token missing or invalid" });
   }
-
+  //recuperamos el usuario que creo la nota
   const user = await User.findById(decodedToken.id);
 
+  //Para la evaluación: agregamos el id del usuario que creo la evluacion a la evaluación
   modelData.user = user._id;
 
+  //cargamos la evaluación en la base de datos pero ademas debemos agregar la evaluacion al usuario
   modelData.save((err) => {
     if (!err) {
+      //a lo que viene del array de evaluaciones del usuario le concatenamos esta evaluacion
       user.evaluations = user.evaluations.concat(modelData._id);
+      //y lo guardamos en la base de datos en el usuario
       user.save();
 
       res.send(modelData);

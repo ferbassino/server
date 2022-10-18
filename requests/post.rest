@@ -10,3 +10,12 @@ Content-Type: application/json
     "contentType": "text/csv"
   }
 }
+###
+POST   http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+  "username": "juan",
+  "name": "juan",
+  "password": "1234"
+}
